@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ヨドバシポイント最適払い計算機 Ultimate</title>
-    <meta name="description" content="Yodobashi Points Payment Optimizer Ultimate Edition">
+    <title>ヨドバシゴールドポイント最適払い計算機</title>
+    <meta name="description" content="Yodobashi Gold Point Payment Optimizer">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         [v-cloak] { display: none; }
@@ -22,11 +22,13 @@
 <div id="app" class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow" v-cloak>
     
     <header class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-red-600 mb-2">ヨドバシポイント最適払い</h1>
-        <p class="text-sm text-slate-500 font-medium tracking-wider">ULTIMATE EDITION</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
+            <span class="text-red-600">ヨドバシゴールドポイント</span>最適払い
+        </h1>
+        <p class="text-xs text-slate-500">損をしないためのポイント利用シミュレーター</p>
     </header>
 
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-slate-200">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
         <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">
@@ -34,19 +36,19 @@
                 </label>
                 <div class="relative">
                     <input type="number" v-model.number="heldPoints" class="w-full border-slate-300 border rounded-lg p-3 pl-3 pr-10 focus:ring-2 focus:ring-red-500 focus:outline-none transition shadow-sm" placeholder="例: 5000">
-                    <span class="absolute right-3 top-3 text-slate-400 text-sm">P</span>
+                    <span class="absolute right-3 top-3 text-slate-400 text-sm font-bold">P</span>
                 </div>
             </div>
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">表示順序</label>
                 <div class="flex bg-slate-100 p-1 rounded-lg">
                     <button @click="sortMode = 'rate'" 
-                        :class="{'bg-white text-red-600 shadow': sortMode === 'rate', 'text-slate-500 hover:text-slate-700': sortMode !== 'rate'}"
+                        :class="{'bg-white text-red-600 shadow-sm': sortMode === 'rate', 'text-slate-500 hover:text-slate-700': sortMode !== 'rate'}"
                         class="flex-1 py-2 rounded-md text-sm font-bold transition duration-200">
                         還元率順 (推奨)
                     </button>
                     <button @click="sortMode = 'points'"
-                        :class="{'bg-white text-red-600 shadow': sortMode === 'points', 'text-slate-500 hover:text-slate-700': sortMode !== 'points'}"
+                        :class="{'bg-white text-red-600 shadow-sm': sortMode === 'points', 'text-slate-500 hover:text-slate-700': sortMode !== 'points'}"
                         class="flex-1 py-2 rounded-md text-sm font-bold transition duration-200">
                         消費Ｐ順
                     </button>
@@ -58,14 +60,14 @@
 
         <div class="mb-4">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <h2 class="text-lg font-bold flex items-center text-slate-700">
+                    <svg class="w-5 h-5 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     買い物リスト
                 </h2>
-                <button @click="clearList" class="text-xs text-red-500 hover:text-red-700 underline font-medium">すべてクリア</button>
+                <button @click="clearList" class="text-xs text-red-600 hover:text-red-800 underline font-medium">すべてクリア</button>
             </div>
 
-            <div v-for="(item, index) in items" :key="index" class="flex flex-wrap md:flex-nowrap gap-3 mb-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+            <div v-for="(item, index) in items" :key="index" class="flex flex-wrap md:flex-nowrap gap-3 mb-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <div class="w-full md:w-5/12">
                     <label class="block text-xs text-slate-500 font-bold mb-1">価格 (税込)</label>
                     <div class="relative">
@@ -85,17 +87,17 @@
                     <input type="number" v-model.number="item.qty" class="w-full border-slate-300 border rounded-lg p-2 text-sm focus:outline-none focus:border-red-500" placeholder="1">
                 </div>
                 <div class="w-auto md:w-auto flex items-center justify-center pb-1">
-                    <button @click="removeItem(index)" class="text-slate-400 hover:text-red-500 p-2 transition rounded-full hover:bg-red-50">
+                    <button @click="removeItem(index)" class="text-slate-400 hover:text-red-500 p-2 transition rounded-full hover:bg-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                 </div>
             </div>
 
             <div class="flex gap-3 mt-5">
-                <button @click="addItem" class="flex-1 bg-slate-800 text-white py-3 rounded-xl hover:bg-slate-700 transition shadow-md font-bold text-sm flex items-center justify-center">
+                <button @click="addItem" class="flex-1 bg-slate-800 text-white py-3 rounded-lg hover:bg-slate-700 transition shadow-sm font-bold text-sm flex items-center justify-center">
                     <span class="mr-2 text-lg">+</span> 商品を追加
                 </button>
-                <button @click="showRawInput = !showRawInput" class="px-5 py-3 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-bold transition">
+                <button @click="showRawInput = !showRawInput" class="px-5 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-100 text-sm font-bold transition">
                     {{ showRawInput ? '閉じる' : 'テキスト入力' }}
                 </button>
             </div>
@@ -113,15 +115,15 @@
         </div>
         <div>
             <p class="text-blue-900 font-bold text-lg">
-                <span class="text-2xl">{{ maxSafePoints.toLocaleString() }}</span> ポイントまで使っても損しません！
+                <span class="text-2xl">{{ maxSafePoints.toLocaleString() }}</span> ポイントまで使っても損しません
             </p>
             <p class="text-blue-700 text-sm mt-1">
-                現金払いと同等の還元率({{ formatRate(maxRate) }})を維持したまま、ポイントを消費できます。
+                端数処理の仕様上、ここまでなら現金払いと同等の還元率({{ formatRate(maxRate) }})が維持されます。
             </p>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-slate-200">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
         <div class="p-4 bg-slate-800 text-white flex justify-between items-center">
             <h2 class="font-bold flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
@@ -137,11 +139,11 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
-                        <th class="p-4 font-bold">評価</th>
-                        <th class="p-4 font-bold text-right">利用ポイント</th>
-                        <th class="p-4 font-bold text-right">現金支払い</th>
-                        <th class="p-4 font-bold text-right">獲得ポイント</th>
-                        <th class="p-4 font-bold text-right">実質還元率</th>
+                        <th class="p-4 font-bold whitespace-nowrap">評価</th>
+                        <th class="p-4 font-bold text-right whitespace-nowrap">利用ポイント</th>
+                        <th class="p-4 font-bold text-right whitespace-nowrap">現金支払い</th>
+                        <th class="p-4 font-bold text-right whitespace-nowrap">獲得ポイント</th>
+                        <th class="p-4 font-bold text-right whitespace-nowrap">実質還元率</th>
                     </tr>
                 </thead>
                 <tbody class="text-sm">
@@ -214,37 +216,34 @@
         <details class="mb-8 group">
             <summary class="flex items-center justify-center text-sm font-bold text-slate-500 hover:text-red-600 transition select-none">
                 <svg class="w-4 h-4 mr-2 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                最適化の仕組み（なぜポイントを使っても損しないのか？）
+                計算ロジックについて（たけぼう氏の解説より）
             </summary>
             <div class="mt-4 p-6 bg-slate-50 rounded-xl text-sm leading-relaxed text-slate-700 max-w-2xl mx-auto border border-slate-100">
-                <h3 class="font-bold text-slate-900 mb-2">Q. ポイントを使うと還元が付かないはずでは？</h3>
+                <h3 class="font-bold text-slate-900 mb-2">なぜポイントを使っても損しない場合があるのか</h3>
                 <p class="mb-3">
-                    A. はい、基本的には損をします。しかし、ヨドバシの計算システムには<b>「商品単価ごとのポイント按分」</b>と<b>「端数の切り上げ処理」</b>という特徴があります。
+                    ヨドバシカメラのシステムでは、支払いにポイントを使用した場合、まず「商品価格に応じて利用ポイントが按分」され、「各商品の残額（現金相当額）が四捨五入」で計算されます。
+                    <br>そして、その残額に還元率を掛けたあと、最終的な獲得ポイントは<b>「小数点以下切り上げ」</b>で処理されます。
                 </p>
-                <div class="bg-white p-3 rounded border border-slate-200 mb-3 font-mono text-xs">
+                <div class="bg-white p-4 rounded border border-slate-200 mb-3 font-mono text-xs shadow-sm">
                     例: 1,980円 (10%) の商品を2つ買う場合<br>
-                    合計3,960円。通常396ポイント獲得。<br>
+                    合計3,960円。通常 396ポイント獲得。<br>
                     <br>
                     ここで <b>1ポイントだけ</b> 使って3,959円支払うと…<br>
-                    システム上の計算: (1,980 - 0.5) × 10% = 197.95 ポイント<br>
-                    端数処理: 197.95 → <b>198ポイント</b> (切り上げ)<br>
-                    合計: 198 × 2個 = <b>396ポイント (変わらない！)</b>
+                    按分: 1,980円 - 0.5P = 1,979.5円 (四捨五入して 1,980円扱い)<br>
+                    還元: 1,980円 × 10% = 198ポイント<br>
+                    合計: 198 × 2個 = <b>396ポイント (獲得数変わらず！)</b>
                 </div>
                 <p>
-                    このように、計算結果の端数が切り上げられるギリギリの範囲内であれば、<b>ポイントを使っても獲得ポイントが1ポイントも減らない（＝実質還元率が維持される）</b>現象が発生します。<br>
-                    本ツールは、この「隙間」が発生する金額を総当たりで計算し、最もお得なポイント利用額を提示しています。
+                    このツールは、上記のような「端数処理の隙間」が発生する利用額を総当たりで計算し、還元率が低下しない（あるいは向上する）ポイント数を提示しています。
                 </p>
             </div>
         </details>
 
         <div class="text-center">
             <p class="text-sm text-slate-600 leading-relaxed">
-                本ツールは、偉大な先駆者である <a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-red-600 font-bold hover:underline">takebo氏</a> による<br class="md:hidden">
-                「ヨドバシポイント最適払い計算機」に深い敬意を表し、<br class="hidden md:inline">
-                その画期的なロジックを継承して再構築したものです。
-            </p>
-            <p class="text-xs text-slate-400 mt-4">
-                Re-implemented with modern UI technologies.
+                本ツールは、<a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-red-600 font-bold hover:underline">たけぼう様</a> の研究による<br class="md:hidden">
+                「ヨドバシポイント最適払い計算機」のロジックを元に、<br class="hidden md:inline">
+                現代的なUIで再実装したものです。
             </p>
         </div>
     </div>
@@ -265,15 +264,17 @@ createApp({
             return items.value.reduce((sum, item) => sum + (item.price * item.qty), 0);
         });
 
-        // 獲得ポイント計算ロジック
+        // 獲得ポイント計算ロジック（たけぼう氏のロジック準拠）
+        // 獲得ポイントn = Ceil( Round( 価格n - (価格n / 合計額 * 支払ポイント合計) ) * ポイント還元率n )
         const calcPoints = (payp, currentItems, total) => {
             let getp = 0;
             for (const item of currentItems) {
                 const price = item.price;
                 const rate = item.rate / 100;
                 const qty = item.qty;
-                // 按分計算と端数処理
+                // 1. ポイント按分と、残額(現金相当)の四捨五入
                 const discountedBase = Math.round(price - (payp * price / total));
+                // 2. 還元率を掛けて、切り上げ
                 const itemPoints = Math.ceil(discountedBase * rate) * qty;
                 getp += itemPoints;
             }
@@ -292,7 +293,7 @@ createApp({
         const results = computed(() => {
             if (totalPrice.value === 0) return [];
             
-            const limit = 2000;
+            const limit = 3000;
             const currentItems = items.value;
             const total = totalPrice.value;
             const userLimit = heldPoints.value !== null ? heldPoints.value : total;
@@ -309,6 +310,7 @@ createApp({
 
                 const newGetP = calcPoints(payp, currentItems, total);
                 
+                // 獲得ポイントが変わらない間は、より多くポイントを使えるまでループを回す
                 if (newGetP === currentGetP) continue;
                 
                 // ポイントが減る直前の値が局所最適解
@@ -401,11 +403,9 @@ createApp({
 
         // Styling helpers
         const getRowClass = (res) => {
-            // どちらかのフラグが立っていればハイライト
             if (res.isBestRate || res.isMaxSafeUsage) return 'highlight-row';
-            
-            if (res.rate >= maxRate.value) return 'bg-white hover:bg-slate-50'; // 損なし
-            return 'bg-slate-50 text-slate-400'; // 損
+            if (res.rate >= maxRate.value) return 'bg-white hover:bg-slate-50';
+            return 'bg-slate-50 text-slate-400';
         };
 
         const getRateClass = (res) => {
