@@ -11,263 +11,137 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         [v-cloak] { display: none; }
+        .highlight-row { background-color: #fffbeb; border-left: 4px solid #f59e0b; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
 
-<div id="app" class="max-w-3xl mx-auto px-4 py-8 w-full flex-grow" v-cloak>
+<div id="app" class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow" v-cloak>
     
     <header class="mb-8 text-center">
         <h1 class="text-3xl font-bold text-red-600 mb-2">ヨドバシポイント最適払い</h1>
-        <p class="text-sm text-gray-500 font-medium tracking-wider">MODERN EDITION</p>
+        <p class="text-sm text-slate-500 font-medium tracking-wider">SMART OPTIMIZER</p>
     </header>
 
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-slate-200">
         
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">所持ポイント (上限)</label>
-                <input type="number" v-model.number="heldPoints" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none transition" placeholder="無制限なら空欄">
+                <label class="block text-sm font-bold text-slate-700 mb-2">
+                    所持ポイント (上限)
+                    <span class="text-xs font-normal text-slate-500 ml-1">※これ以上は計算しません</span>
+                </label>
+                <div class="relative">
+                    <input type="number" v-model.number="heldPoints" class="w-full border-slate-300 border rounded-lg p-3 pl-3 pr-10 focus:ring-2 focus:ring-red-500 focus:outline-none transition shadow-sm" placeholder="例: 5000">
+                    <span class="absolute right-3 top-3 text-slate-400 text-sm">P</span>
+                </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">並び替え</label>
-                <div class="flex space-x-4 mt-2">
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="radio" v-model="sortMode" value="points" class="text-red-600 focus:ring-red-500">
-                        <span class="ml-2">獲得P順</span>
-                    </label>
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="radio" v-model="sortMode" value="rate" class="text-red-600 focus:ring-red-500">
-                        <span class="ml-2">還元率順</span>
-                    </label>
+                <label class="block text-sm font-bold text-slate-700 mb-2">表示順序</label>
+                <div class="flex bg-slate-100 p-1 rounded-lg">
+                    <button @click="sortMode = 'rate'" 
+                        :class="{'bg-white text-red-600 shadow': sortMode === 'rate', 'text-slate-500 hover:text-slate-700': sortMode !== 'rate'}"
+                        class="flex-1 py-2 rounded-md text-sm font-bold transition duration-200">
+                        還元率重視 (推奨)
+                    </button>
+                    <button @click="sortMode = 'points'"
+                        :class="{'bg-white text-red-600 shadow': sortMode === 'points', 'text-slate-500 hover:text-slate-700': sortMode !== 'points'}"
+                        class="flex-1 py-2 rounded-md text-sm font-bold transition duration-200">
+                        消費Ｐ重視
+                    </button>
                 </div>
             </div>
         </div>
 
-        <hr class="my-6 border-gray-200">
+        <hr class="my-6 border-slate-100">
 
         <div class="mb-4">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-lg font-semibold">買い物リスト</h2>
-                <button @click="clearList" class="text-xs text-red-500 hover:underline">すべてクリア</button>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    買い物リスト
+                </h2>
+                <button @click="clearList" class="text-xs text-red-500 hover:text-red-700 underline font-medium">すべてクリア</button>
             </div>
 
-            <div v-for="(item, index) in items" :key="index" class="flex flex-wrap md:flex-nowrap gap-2 mb-3 items-end bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <div class="w-full md:w-1/3">
-                    <label class="text-xs text-gray-500 font-bold">価格(円)</label>
-                    <input type="number" v-model.number="item.price" class="w-full border rounded p-2 text-sm focus:outline-none focus:border-red-400" placeholder="1980">
+            <div v-for="(item, index) in items" :key="index" class="flex flex-wrap md:flex-nowrap gap-3 mb-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="w-full md:w-5/12">
+                    <label class="block text-xs text-slate-500 font-bold mb-1">価格 (税込)</label>
+                    <div class="relative">
+                        <input type="number" v-model.number="item.price" class="w-full border-slate-300 border rounded-lg p-2 pr-8 text-sm focus:outline-none focus:border-red-500" placeholder="1980">
+                        <span class="absolute right-3 top-2 text-slate-400 text-xs">円</span>
+                    </div>
                 </div>
-                <div class="w-1/2 md:w-1/4">
-                    <label class="text-xs text-gray-500 font-bold">還元率(%)</label>
-                    <input type="number" v-model.number="item.rate" class="w-full border rounded p-2 text-sm focus:outline-none focus:border-red-400" placeholder="10">
+                <div class="w-5/12 md:w-3/12">
+                    <label class="block text-xs text-slate-500 font-bold mb-1">還元率</label>
+                    <div class="relative">
+                        <input type="number" v-model.number="item.rate" class="w-full border-slate-300 border rounded-lg p-2 pr-8 text-sm focus:outline-none focus:border-red-500" placeholder="10">
+                        <span class="absolute right-3 top-2 text-slate-400 text-xs">%</span>
+                    </div>
                 </div>
-                <div class="w-1/2 md:w-1/4">
-                    <label class="text-xs text-gray-500 font-bold">個数</label>
-                    <input type="number" v-model.number="item.qty" class="w-full border rounded p-2 text-sm focus:outline-none focus:border-red-400" placeholder="1">
+                <div class="w-5/12 md:w-3/12">
+                    <label class="block text-xs text-slate-500 font-bold mb-1">個数</label>
+                    <input type="number" v-model.number="item.qty" class="w-full border-slate-300 border rounded-lg p-2 text-sm focus:outline-none focus:border-red-500" placeholder="1">
                 </div>
-                <button @click="removeItem(index)" class="text-gray-400 hover:text-red-500 p-2 transition">
-                    ✕
-                </button>
+                <div class="w-auto md:w-auto flex items-center justify-center pb-1">
+                    <button @click="removeItem(index)" class="text-slate-400 hover:text-red-500 p-2 transition rounded-full hover:bg-red-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
             </div>
 
-            <div class="flex gap-2 mt-4">
-                <button @click="addItem" class="flex-1 bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-700 transition shadow-md">
-                    + 商品を追加
+            <div class="flex gap-3 mt-5">
+                <button @click="addItem" class="flex-1 bg-slate-800 text-white py-3 rounded-xl hover:bg-slate-700 transition shadow-md font-bold text-sm flex items-center justify-center">
+                    <span class="mr-2 text-lg">+</span> 商品を追加
                 </button>
-                <button @click="showRawInput = !showRawInput" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 text-sm transition">
-                    {{ showRawInput ? 'テキスト入力を隠す' : '一括テキスト入力' }}
+                <button @click="showRawInput = !showRawInput" class="px-5 py-3 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-bold transition">
+                    {{ showRawInput ? '閉じる' : 'テキスト入力' }}
                 </button>
             </div>
         </div>
 
-        <div v-if="showRawInput" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <label class="block text-sm text-gray-600 mb-1 font-bold">旧形式での入力 (例: 1980 P10% *2)</label>
-            <textarea v-model="rawInput" @input="parseRawInput" class="w-full h-24 border rounded p-2 text-sm font-mono focus:outline-none focus:border-red-400"></textarea>
+        <div v-if="showRawInput" class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <label class="block text-sm text-slate-600 mb-2 font-bold">貼り付け入力 (例: 1980 P10% *2)</label>
+            <textarea v-model="rawInput" @input="parseRawInput" class="w-full h-24 border border-slate-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-red-500"></textarea>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-        <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
-            <h2 class="font-bold">計算結果</h2>
-            <div class="text-sm">
-                合計: <span class="text-xl font-bold">{{ totalPrice.toLocaleString() }}</span> 円
+    <div v-if="totalPrice > 0 && maxSafePoints > 0" class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm flex items-start">
+        <div class="text-blue-500 mr-3 mt-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div>
+            <p class="text-blue-900 font-bold text-lg">
+                <span class="text-2xl">{{ maxSafePoints.toLocaleString() }}</span> ポイントまで使っても損しません！
+            </p>
+            <p class="text-blue-700 text-sm">
+                端数処理の隙間を突くことで、実質還元率 {{ formatRate(maxRate) }} をキープしたままポイントを消費できます。
+            </p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-slate-200">
+        <div class="p-4 bg-slate-800 text-white flex justify-between items-center">
+            <h2 class="font-bold flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                計算結果
+            </h2>
+            <div class="text-right">
+                <div class="text-xs text-slate-300">お支払い合計</div>
+                <div class="text-xl font-bold leading-none">{{ totalPrice.toLocaleString() }} <span class="text-sm">円</span></div>
             </div>
         </div>
         
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-100 text-gray-600 text-sm border-b">
-                        <th class="p-3 whitespace-nowrap">利用ポイント</th>
-                        <th class="p-3 whitespace-nowrap">現金支払い</th>
-                        <th class="p-3 whitespace-nowrap">獲得ポイント</th>
-                        <th class="p-3 whitespace-nowrap">実質還元率</th>
+                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                        <th class="p-4 font-bold">判定</th>
+                        <th class="p-4 font-bold text-right">利用ポイント</th>
+                        <th class="p-4 font-bold text-right">現金支払い</th>
+                        <th class="p-4 font-bold text-right">獲得ポイント</th>
+                        <th class="p-4 font-bold text-right">実質還元率</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="bg-blue-50 border-b border-blue-100">
-                        <td class="p-3 font-bold text-blue-800">0 P (全額現金)</td>
-                        <td class="p-3">{{ totalPrice.toLocaleString() }} 円</td>
-                        <td class="p-3 font-bold">{{ maxGetP.toLocaleString() }} P</td>
-                        <td class="p-3">{{ formatRate(maxRate) }}</td>
-                    </tr>
-
-                    <tr v-for="(res, idx) in sortedResults" :key="idx" 
-                        :class="{'bg-red-50': idx === 0 && res.rate >= maxRate, 'hover:bg-gray-50': true}" 
-                        class="border-b last:border-0 transition">
-                        <td class="p-3 font-mono font-bold text-red-600">{{ res.payp.toLocaleString() }} P</td>
-                        <td class="p-3">{{ (totalPrice - res.payp).toLocaleString() }} 円</td>
-                        <td class="p-3 font-bold">{{ res.getp.toLocaleString() }} P</td>
-                        <td class="p-3">
-                            <span :class="{'bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold': res.rate >= maxRate}">
-                                {{ formatRate(res.rate) }}
-                            </span>
-                        </td>
-                    </tr>
-                    
-                    <tr v-if="sortedResults.length === 0" class="text-center text-gray-500">
-                        <td colspan="4" class="p-8">
-                            計算結果なし<br>
-                            <span class="text-xs">（全額現金払いが最適、または条件に合うパターンがありません）</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<footer class="bg-white border-t border-gray-200 py-8 mt-auto">
-    <div class="max-w-3xl mx-auto px-4 text-center">
-        <p class="text-sm text-gray-600 leading-relaxed">
-            本ツールは、偉大な先駆者である <a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-red-600 font-bold hover:underline">takebo氏</a> による<br class="md:hidden">
-            「ヨドバシポイント最適払い計算機」に深い敬意を表し、<br class="hidden md:inline">
-            その画期的なロジックを継承して再構築したものです。
-        </p>
-        <p class="text-xs text-gray-400 mt-4">
-            Re-implemented with modern UI technologies.
-        </p>
-    </div>
-</footer>
-
-<script>
-const { createApp, ref, computed } = Vue;
-
-createApp({
-    setup() {
-        const items = ref([{ price: 0, rate: 10, qty: 1 }]);
-        const heldPoints = ref(null);
-        const sortMode = ref('rate');
-        const showRawInput = ref(false);
-        const rawInput = ref('');
-
-        const totalPrice = computed(() => {
-            return items.value.reduce((sum, item) => sum + (item.price * item.qty), 0);
-        });
-
-        const calcPoints = (payp, currentItems, total) => {
-            let getp = 0;
-            for (const item of currentItems) {
-                const price = item.price;
-                const rate = item.rate / 100;
-                const qty = item.qty;
-                const discountedBase = Math.round(price - (payp * price / total));
-                const itemPoints = Math.ceil(discountedBase * rate) * qty;
-                getp += itemPoints;
-            }
-            return getp;
-        };
-
-        const maxGetP = computed(() => {
-            if (totalPrice.value === 0) return 0;
-            return calcPoints(0, items.value, totalPrice.value);
-        });
-
-        const maxRate = computed(() => {
-            return totalPrice.value ? maxGetP.value / totalPrice.value : 0;
-        });
-
-        const results = computed(() => {
-            if (totalPrice.value === 0) return [];
-            
-            const limit = 1000;
-            const currentItems = items.value;
-            const total = totalPrice.value;
-            const userLimit = heldPoints.value !== null ? heldPoints.value : total;
-            
-            let res = [];
-            let currentGetP = maxGetP.value;
-            let payp = 0;
-            let row = 0;
-
-            while (row < limit && currentGetP > 0 && payp < total) {
-                payp++;
-                if (payp > userLimit) break;
-
-                const newGetP = calcPoints(payp, currentItems, total);
-                
-                if (newGetP === currentGetP) continue;
-                
-                const optimalPayP = payp - 1;
-                const lostPoints = maxGetP.value - currentGetP;
-                const cashPaid = total - optimalPayP;
-                const denominator = cashPaid + lostPoints;
-                const rate = denominator ? currentGetP / denominator : 0;
-
-                if (optimalPayP > 0) {
-                    res.push({
-                        payp: optimalPayP,
-                        getp: currentGetP,
-                        rate: rate
-                    });
-                }
-                
-                currentGetP = newGetP;
-                row++;
-            }
-            
-            if (userLimit >= total && row < limit) {
-                 res.push({ payp: total, getp: 0, rate: 0 });
-            }
-
-            return res;
-        });
-
-        const sortedResults = computed(() => {
-            const list = [...results.value];
-            if (sortMode.value === 'rate') {
-                return list.sort((a, b) => b.rate - a.rate);
-            } else {
-                return list.sort((a, b) => b.getp - a.getp);
-            }
-        });
-
-        const addItem = () => items.value.push({ price: 0, rate: 10, qty: 1 });
-        const removeItem = (idx) => items.value.splice(idx, 1);
-        const clearList = () => { items.value = [{ price: 0, rate: 10, qty: 1 }]; rawInput.value = ''; };
-        const formatRate = (val) => (val * 100).toFixed(4) + '%';
-
-        const parseRawInput = () => {
-            const lines = rawInput.value.split(/[\r\n,]+/);
-            const newItems = [];
-            for (const l of lines) {
-                const m = l.match(/(\d+)\s*([%@p](\d+))?\s*(\*\s*(\d+))?/i);
-                if (!m) continue;
-                const price = parseInt(m[1], 10);
-                const rate = m[3] ? parseInt(m[3], 10) : 10;
-                const qty = m[5] ? parseInt(m[5], 10) : 1;
-                newItems.push({ price, rate, qty });
-            }
-            if (newItems.length > 0) items.value = newItems;
-        };
-
-        return {
-            items, heldPoints, sortMode, showRawInput, rawInput,
-            totalPrice, maxGetP, maxRate, sortedResults,
-            addItem, removeItem, clearList, parseRawInput, formatRate
-        };
-    }
-}).mount('#app');
-</script>
-</body>
-</html>
+                <tbody class="text-sm">
+                    <tr class="bg-blue-50/
