@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ヨドバシポイント最適払い計算機 Modern</title>
-    <meta name="description" content="Yodobashi Points Payment Optimizer Modern Edition">
+    <title>ヨドバシポイント最適払い計算機 Ultimate</title>
+    <meta name="description" content="Yodobashi Points Payment Optimizer Ultimate Edition">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -12,6 +12,9 @@
         body { font-family: 'Inter', sans-serif; }
         [v-cloak] { display: none; }
         .highlight-row { background-color: #fffbeb; border-left: 4px solid #f59e0b; }
+        .badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; border-width: 1px; margin-right: 0.25rem; white-space: nowrap; }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
@@ -20,16 +23,14 @@
     
     <header class="mb-8 text-center">
         <h1 class="text-3xl font-bold text-red-600 mb-2">ヨドバシポイント最適払い</h1>
-        <p class="text-sm text-slate-500 font-medium tracking-wider">SMART OPTIMIZER</p>
+        <p class="text-sm text-slate-500 font-medium tracking-wider">ULTIMATE EDITION</p>
     </header>
 
     <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-slate-200">
-        
         <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">
                     所持ポイント (上限)
-                    <span class="text-xs font-normal text-slate-500 ml-1">※これ以上は計算しません</span>
                 </label>
                 <div class="relative">
                     <input type="number" v-model.number="heldPoints" class="w-full border-slate-300 border rounded-lg p-3 pl-3 pr-10 focus:ring-2 focus:ring-red-500 focus:outline-none transition shadow-sm" placeholder="例: 5000">
@@ -42,12 +43,12 @@
                     <button @click="sortMode = 'rate'" 
                         :class="{'bg-white text-red-600 shadow': sortMode === 'rate', 'text-slate-500 hover:text-slate-700': sortMode !== 'rate'}"
                         class="flex-1 py-2 rounded-md text-sm font-bold transition duration-200">
-                        還元率重視 (推奨)
+                        還元率順 (推奨)
                     </button>
                     <button @click="sortMode = 'points'"
                         :class="{'bg-white text-red-600 shadow': sortMode === 'points', 'text-slate-500 hover:text-slate-700': sortMode !== 'points'}"
                         class="flex-1 py-2 rounded-md text-sm font-bold transition duration-200">
-                        消費Ｐ重視
+                        消費Ｐ順
                     </button>
                 </div>
             </div>
@@ -106,7 +107,7 @@
         </div>
     </div>
 
-    <div v-if="totalPrice > 0 && maxSafePoints > 0" class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm flex items-start">
+    <div v-if="totalPrice > 0 && maxSafePoints > 0" class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm flex items-start animate-fade-in">
         <div class="text-blue-500 mr-3 mt-1">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
@@ -114,8 +115,8 @@
             <p class="text-blue-900 font-bold text-lg">
                 <span class="text-2xl">{{ maxSafePoints.toLocaleString() }}</span> ポイントまで使っても損しません！
             </p>
-            <p class="text-blue-700 text-sm">
-                端数処理の隙間を突くことで、実質還元率 {{ formatRate(maxRate) }} をキープしたままポイントを消費できます。
+            <p class="text-blue-700 text-sm mt-1">
+                現金払いと同等の還元率({{ formatRate(maxRate) }})を維持したまま、ポイントを消費できます。
             </p>
         </div>
     </div>
@@ -136,7 +137,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
-                        <th class="p-4 font-bold">判定</th>
+                        <th class="p-4 font-bold">評価</th>
                         <th class="p-4 font-bold text-right">利用ポイント</th>
                         <th class="p-4 font-bold text-right">現金支払い</th>
                         <th class="p-4 font-bold text-right">獲得ポイント</th>
@@ -144,9 +145,9 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm">
-                    <tr class="bg-blue-50/50 border-b border-blue-100">
+                    <tr class="bg-blue-50/30 border-b border-blue-100">
                         <td class="p-4">
-                            <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">基準 (現金)</span>
+                            <span class="badge bg-blue-100 text-blue-800 border-blue-200">基準 (現金)</span>
                         </td>
                         <td class="p-4 text-right font-mono text-slate-400">0 P</td>
                         <td class="p-4 text-right font-medium">{{ totalPrice.toLocaleString() }} 円</td>
@@ -159,22 +160,27 @@
                         class="border-b last:border-0 transition duration-150">
                         
                         <td class="p-4">
-                            <span v-if="res.isRecommended" class="inline-flex items-center px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-bold shadow-sm border border-yellow-200">
-                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                推奨
-                            </span>
-                            <span v-else-if="res.rate >= maxRate" class="inline-block px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold border border-green-200">
-                                損なし
-                            </span>
-                            <span v-else-if="res.rate >= maxRate - 0.005" class="inline-block px-2 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-bold border border-orange-200">
-                                微減
-                            </span>
-                            <span v-else class="inline-block px-2 py-1 rounded-full bg-slate-200 text-slate-500 text-xs font-bold">
-                                低下
-                            </span>
+                            <div class="flex flex-col items-start gap-1">
+                                <span v-if="res.isBestRate" class="badge bg-purple-100 text-purple-800 border-purple-200">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    最も還元率が高い
+                                </span>
+                                
+                                <span v-if="res.isMaxSafeUsage" class="badge bg-green-100 text-green-800 border-green-200">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    損せず最大消費
+                                </span>
+
+                                <span v-if="!res.isBestRate && !res.isMaxSafeUsage && res.rate >= maxRate" class="badge bg-slate-100 text-slate-600 border-slate-200">
+                                    損なし
+                                </span>
+                                <span v-if="res.rate < maxRate && res.rate >= maxRate - 0.005" class="badge bg-orange-50 text-orange-600 border-orange-100">
+                                    微減
+                                </span>
+                            </div>
                         </td>
 
-                        <td class="p-4 text-right font-mono font-bold text-lg" :class="res.isRecommended ? 'text-red-600' : 'text-slate-700'">
+                        <td class="p-4 text-right font-mono font-bold text-lg" :class="(res.isMaxSafeUsage || res.isBestRate) ? 'text-red-600' : 'text-slate-700'">
                             {{ res.payp.toLocaleString() }} P
                         </td>
                         <td class="p-4 text-right text-slate-600">
@@ -193,7 +199,7 @@
                     <tr v-if="sortedResults.length === 0 && totalPrice > 0" class="text-center text-slate-500">
                         <td colspan="5" class="p-10">
                             <p class="mb-2">💡 全額現金払いが最適です</p>
-                            <p class="text-xs">（計算上、ポイントを使うと還元率が下がるパターンしかありません）</p>
+                            <p class="text-xs">（ポイントを使うと確実に還元率が下がるパターンしか見つかりませんでした）</p>
                         </td>
                     </tr>
                 </tbody>
@@ -203,15 +209,44 @@
 </div>
 
 <footer class="bg-white border-t border-slate-200 py-8 mt-auto">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-        <p class="text-sm text-slate-600 leading-relaxed">
-            本ツールは、偉大な先駆者である <a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-red-600 font-bold hover:underline">takebo氏</a> による<br class="md:hidden">
-            「ヨドバシポイント最適払い計算機」に深い敬意を表し、<br class="hidden md:inline">
-            その画期的なロジックを継承して再構築したものです。
-        </p>
-        <p class="text-xs text-slate-400 mt-4">
-            Re-implemented with modern UI technologies.
-        </p>
+    <div class="max-w-4xl mx-auto px-4">
+        
+        <details class="mb-8 group">
+            <summary class="flex items-center justify-center text-sm font-bold text-slate-500 hover:text-red-600 transition select-none">
+                <svg class="w-4 h-4 mr-2 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                最適化の仕組み（なぜポイントを使っても損しないのか？）
+            </summary>
+            <div class="mt-4 p-6 bg-slate-50 rounded-xl text-sm leading-relaxed text-slate-700 max-w-2xl mx-auto border border-slate-100">
+                <h3 class="font-bold text-slate-900 mb-2">Q. ポイントを使うと還元が付かないはずでは？</h3>
+                <p class="mb-3">
+                    A. はい、基本的には損をします。しかし、ヨドバシの計算システムには<b>「商品単価ごとのポイント按分」</b>と<b>「端数の切り上げ処理」</b>という特徴があります。
+                </p>
+                <div class="bg-white p-3 rounded border border-slate-200 mb-3 font-mono text-xs">
+                    例: 1,980円 (10%) の商品を2つ買う場合<br>
+                    合計3,960円。通常396ポイント獲得。<br>
+                    <br>
+                    ここで <b>1ポイントだけ</b> 使って3,959円支払うと…<br>
+                    システム上の計算: (1,980 - 0.5) × 10% = 197.95 ポイント<br>
+                    端数処理: 197.95 → <b>198ポイント</b> (切り上げ)<br>
+                    合計: 198 × 2個 = <b>396ポイント (変わらない！)</b>
+                </div>
+                <p>
+                    このように、計算結果の端数が切り上げられるギリギリの範囲内であれば、<b>ポイントを使っても獲得ポイントが1ポイントも減らない（＝実質還元率が維持される）</b>現象が発生します。<br>
+                    本ツールは、この「隙間」が発生する金額を総当たりで計算し、最もお得なポイント利用額を提示しています。
+                </p>
+            </div>
+        </details>
+
+        <div class="text-center">
+            <p class="text-sm text-slate-600 leading-relaxed">
+                本ツールは、偉大な先駆者である <a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-red-600 font-bold hover:underline">takebo氏</a> による<br class="md:hidden">
+                「ヨドバシポイント最適払い計算機」に深い敬意を表し、<br class="hidden md:inline">
+                その画期的なロジックを継承して再構築したものです。
+            </p>
+            <p class="text-xs text-slate-400 mt-4">
+                Re-implemented with modern UI technologies.
+            </p>
+        </div>
     </div>
 </footer>
 
@@ -222,7 +257,6 @@ createApp({
     setup() {
         const items = ref([{ price: 0, rate: 10, qty: 1 }]);
         const heldPoints = ref(null);
-        // Default changed to 'rate' as requested
         const sortMode = ref('rate'); 
         const showRawInput = ref(false);
         const rawInput = ref('');
@@ -231,12 +265,14 @@ createApp({
             return items.value.reduce((sum, item) => sum + (item.price * item.qty), 0);
         });
 
+        // 獲得ポイント計算ロジック
         const calcPoints = (payp, currentItems, total) => {
             let getp = 0;
             for (const item of currentItems) {
                 const price = item.price;
                 const rate = item.rate / 100;
                 const qty = item.qty;
+                // 按分計算と端数処理
                 const discountedBase = Math.round(price - (payp * price / total));
                 const itemPoints = Math.ceil(discountedBase * rate) * qty;
                 getp += itemPoints;
@@ -266,6 +302,7 @@ createApp({
             let payp = 0;
             let row = 0;
 
+            // ポイント数を1ずつ増やしてシミュレーション
             while (row < limit && currentGetP > 0 && payp < total) {
                 payp++;
                 if (payp > userLimit) break;
@@ -274,6 +311,7 @@ createApp({
                 
                 if (newGetP === currentGetP) continue;
                 
+                // ポイントが減る直前の値が局所最適解
                 const optimalPayP = payp - 1;
                 const lostPoints = maxGetP.value - currentGetP;
                 const cashPaid = total - optimalPayP;
@@ -285,8 +323,8 @@ createApp({
                         payp: optimalPayP,
                         getp: currentGetP,
                         rate: rate,
-                        // Preliminary flags
-                        isRecommended: false 
+                        isBestRate: false,
+                        isMaxSafeUsage: false
                     });
                 }
                 
@@ -294,49 +332,59 @@ createApp({
                 row++;
             }
             
-            // Allow full payment if efficient
+            // 全額支払いチェック
             if (userLimit >= total && row < limit) {
-                 res.push({ payp: total, getp: 0, rate: 0, isRecommended: false });
+                 res.push({ payp: total, getp: 0, rate: 0, isBestRate: false, isMaxSafeUsage: false });
             }
 
-            // Flag Logic: Find the highest payp among those with rate >= maxRate
-            // But we need to do this carefully.
-            let bestPaySafe = -1;
+            // --- フラグ判定ロジック ---
             
-            // First pass to find max Safe Pay
+            // 1. 全パターンの中での最高還元率を探す
+            let globalBestRate = -1;
             res.forEach(r => {
-                if (r.rate >= maxRate.value) {
-                    if (r.payp > bestPaySafe) bestPaySafe = r.payp;
+                if (r.rate > globalBestRate) globalBestRate = r.rate;
+            });
+
+            // 2. 「損せず最大消費」のターゲットを探す
+            // 条件: 還元率 >= 現金払いの還元率 (maxRate)
+            // その中で payp が最大のもの
+            let maxSafePay = -1;
+            res.forEach(r => {
+                if (r.rate >= maxRate.value - 0.0000001) { // 浮動小数点誤差許容
+                     if (r.payp > maxSafePay) maxSafePay = r.payp;
                 }
             });
 
-            // Second pass to mark
+            // 3. フラグ付与
             res.forEach(r => {
-                if (r.payp === bestPaySafe && r.rate >= maxRate.value) {
-                    r.isRecommended = true;
+                // 最高還元率フラグ (浮動小数点比較)
+                if (Math.abs(r.rate - globalBestRate) < 0.0000001) {
+                    r.isBestRate = true;
+                }
+                // 損せず最大消費フラグ
+                // ※ 最高還元率のものと重複する可能性あり。その場合は両方つく
+                if (r.payp === maxSafePay && maxSafePay !== -1) {
+                    r.isMaxSafeUsage = true;
                 }
             });
 
             return res;
         });
 
-        // Computed for the Advice Banner
         const maxSafePoints = computed(() => {
             const list = results.value;
             let maxP = 0;
             for(const r of list) {
-                if (r.rate >= maxRate.value && r.payp > maxP) {
-                    maxP = r.payp;
-                }
+                if (r.isMaxSafeUsage) return r.payp;
             }
-            return maxP;
+            return 0;
         });
 
         const sortedResults = computed(() => {
             const list = [...results.value];
             if (sortMode.value === 'rate') {
                 return list.sort((a, b) => {
-                    // Custom sort: Rate DESC, then PayP DESC (Since we want to use points)
+                    // 還元率降順 -> ポイント利用額降順
                     if (Math.abs(b.rate - a.rate) > 0.000001) return b.rate - a.rate;
                     return b.payp - a.payp;
                 });
@@ -353,13 +401,15 @@ createApp({
 
         // Styling helpers
         const getRowClass = (res) => {
-            if (res.isRecommended) return 'highlight-row';
-            if (res.rate >= maxRate.value) return 'bg-green-50 hover:bg-green-100';
-            if (res.rate >= maxRate.value - 0.005) return 'bg-white hover:bg-slate-50'; // Neutral
-            return 'bg-slate-50 text-slate-400'; // Bad
+            // どちらかのフラグが立っていればハイライト
+            if (res.isBestRate || res.isMaxSafeUsage) return 'highlight-row';
+            
+            if (res.rate >= maxRate.value) return 'bg-white hover:bg-slate-50'; // 損なし
+            return 'bg-slate-50 text-slate-400'; // 損
         };
 
         const getRateClass = (res) => {
+            if (res.isBestRate) return 'font-bold text-purple-700';
             if (res.rate >= maxRate.value) return 'font-bold text-green-700';
             if (res.rate >= maxRate.value - 0.005) return 'font-bold text-orange-600';
             return 'text-slate-400';
