@@ -12,165 +12,166 @@
         body { font-family: 'Inter', sans-serif; }
         [v-cloak] { display: none; }
         
-        /* 元祖リスペクト配色 */
-        /* ピンク: ベスト（損せず一番多く使える） */
-        .row-best { background-color: #ffc0cb; } 
-        /* 黄色: ベター（損はしない） */
-        .row-better { background-color: #ffff00; }
+        /* カスタムハイライト色: 上品かつオトクな色合い */
+        /* 損せず最大消費 = ゴールド (金運・利益) */
+        .highlight-max { background-color: #fffbeb; border-left: 4px solid #f59e0b; } 
+        /* 最高還元率 = ローズ (特別感・理論値) */
+        .highlight-best { background-color: #fff1f2; border-left: 4px solid #e11d48; }
         
+        .badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; border-width: 1px; margin-right: 0.25rem; white-space: nowrap; }
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
+        
+        /* 入力フォームのフォーカスリングを上品に */
+        .input-focus:focus { outline: none; border-color: #f59e0b; ring: 2px; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-<div id="app" class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow" v-cloak>
+<div id="app" class="max-w-4xl mx-auto px-4 py-10 w-full flex-grow" v-cloak>
     
     <header class="mb-8 text-center">
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
-            ヨドバシゴールドポイント最適払い
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+            <span class="text-[#e60012]">ヨドバシゴールドポイント</span>最適払い
         </h1>
-        <p class="text-xs text-slate-500">損をしないためのポイント利用シミュレーター</p>
     </header>
 
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
-        <div class="mb-6">
-            <label class="block text-sm font-bold text-slate-700 mb-2">
-                所持ポイント (上限)
-            </label>
-            <div class="relative">
-                <input type="number" v-model.number="heldPoints" class="w-full border-slate-300 border rounded-lg p-3 pl-3 pr-10 focus:ring-2 focus:ring-slate-400 focus:outline-none transition shadow-sm" placeholder="例: 5000">
-                <span class="absolute right-3 top-3 text-slate-400 text-sm font-bold">P</span>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 relative">
+        
+        <div class="flex justify-end items-center mb-6 gap-4">
+            <div class="flex items-center bg-slate-50 rounded-lg px-3 py-1.5 border border-slate-200">
+                <label class="text-xs font-bold text-slate-400 mr-2 whitespace-nowrap">所持ポイント上限</label>
+                <input type="number" v-model.number="heldPoints" class="w-20 bg-transparent text-right text-sm font-bold text-slate-700 focus:outline-none placeholder-slate-300" placeholder="無制限">
+                <span class="text-xs text-slate-400 ml-1">P</span>
             </div>
+            
+            <button @click="clearList" class="text-xs text-slate-400 hover:text-red-500 font-bold transition flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                クリア
+            </button>
         </div>
 
-        <hr class="my-6 border-slate-100">
-
-        <div class="mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold flex items-center text-slate-700">
-                    <svg class="w-5 h-5 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    買い物リスト
-                </h2>
-                <button @click="clearList" class="text-xs text-slate-500 hover:text-slate-800 underline font-medium">すべてクリア</button>
-            </div>
-
-            <div v-for="(item, index) in items" :key="index" class="flex flex-wrap md:flex-nowrap gap-3 mb-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="mb-2">
+            <div v-for="(item, index) in items" :key="index" class="flex flex-wrap md:flex-nowrap gap-4 mb-4 items-end animate-fade-in">
+                
                 <div class="w-full md:w-5/12">
-                    <label class="block text-xs text-slate-500 font-bold mb-1">価格 (税込)</label>
+                    <label class="block text-xs text-slate-500 font-bold mb-1.5 ml-1">商品の価格 (税込)</label>
                     <div class="relative">
-                        <input type="number" v-model.number="item.price" class="w-full border-slate-300 border rounded-lg p-2 pr-8 text-sm focus:outline-none focus:border-slate-400" placeholder="1980">
-                        <span class="absolute right-3 top-2 text-slate-400 text-xs">円</span>
+                        <input type="number" v-model.number="item.price" class="w-full border-slate-200 border bg-slate-50 rounded-xl p-3 pr-8 text-lg font-bold text-slate-800 input-focus transition shadow-inner" placeholder="0">
+                        <span class="absolute right-4 top-4 text-slate-400 text-sm font-bold">円</span>
                     </div>
                 </div>
+
                 <div class="w-5/12 md:w-3/12">
-                    <label class="block text-xs text-slate-500 font-bold mb-1">還元率</label>
+                    <label class="block text-xs text-slate-400 font-bold mb-1.5 ml-1">還元率</label>
                     <div class="relative">
-                        <input type="number" v-model.number="item.rate" class="w-full border-slate-300 border rounded-lg p-2 pr-8 text-sm focus:outline-none focus:border-slate-400" placeholder="10">
-                        <span class="absolute right-3 top-2 text-slate-400 text-xs">%</span>
+                        <input type="number" v-model.number="item.rate" class="w-full border-slate-200 border rounded-xl p-3 pr-8 text-sm font-medium text-slate-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition" placeholder="10">
+                        <span class="absolute right-3 top-3.5 text-slate-400 text-xs font-bold">%</span>
                     </div>
                 </div>
-                <div class="w-5/12 md:w-3/12">
-                    <label class="block text-xs text-slate-500 font-bold mb-1">個数</label>
-                    <input type="number" v-model.number="item.qty" class="w-full border-slate-300 border rounded-lg p-2 text-sm focus:outline-none focus:border-slate-400" placeholder="1">
+
+                <div class="w-4/12 md:w-2/12">
+                    <label class="block text-xs text-slate-400 font-bold mb-1.5 ml-1">個数</label>
+                    <input type="number" v-model.number="item.qty" class="w-full border-slate-200 border rounded-xl p-3 text-center text-sm font-medium text-slate-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition" placeholder="1">
                 </div>
-                <div class="w-auto md:w-auto flex items-center justify-center pb-1">
-                    <button @click="removeItem(index)" class="text-slate-400 hover:text-slate-600 p-2 transition rounded-full hover:bg-slate-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+
+                <div class="w-auto md:w-auto flex items-center justify-center pb-2">
+                    <button @click="removeItem(index)" class="text-slate-300 hover:text-slate-500 hover:bg-slate-100 p-2 rounded-full transition" title="削除">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
             </div>
 
-            <div class="flex gap-3 mt-5">
-                <button @click="addItem" class="flex-1 bg-slate-800 text-white py-3 rounded-lg hover:bg-slate-700 transition shadow-sm font-bold text-sm flex items-center justify-center">
-                    <span class="mr-2 text-lg">+</span> 商品を追加
+            <div class="flex gap-4 mt-8">
+                <button @click="addItem" class="flex-1 bg-slate-800 text-white py-3.5 rounded-xl hover:bg-slate-700 transition shadow-lg shadow-slate-200 font-bold text-sm flex items-center justify-center group">
+                    <span class="bg-slate-700 rounded-full w-5 h-5 flex items-center justify-center mr-2 group-hover:bg-slate-600 text-xs">+</span> 商品を追加
                 </button>
-                <button @click="showRawInput = !showRawInput" class="px-5 py-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-100 text-sm font-bold transition">
+                <button @click="showRawInput = !showRawInput" class="px-6 py-3.5 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-700 text-sm font-bold transition">
                     {{ showRawInput ? '閉じる' : 'テキスト入力' }}
                 </button>
             </div>
         </div>
 
-        <div v-if="showRawInput" class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <label class="block text-sm text-slate-600 mb-2 font-bold">貼り付け入力 (例: 1980 P10% *2)</label>
-            <textarea v-model="rawInput" @input="parseRawInput" class="w-full h-24 border border-slate-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-slate-400"></textarea>
+        <div v-if="showRawInput" class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <label class="block text-sm text-slate-500 mb-2 font-bold">貼り付け入力 (例: 1980 P10% *2)</label>
+            <textarea v-model="rawInput" @input="parseRawInput" class="w-full h-24 border border-slate-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-amber-400"></textarea>
         </div>
     </div>
 
-    <div v-if="totalPrice > 0 && maxSafePoints > 0" class="mb-4 bg-white border-l-4 border-pink-400 p-4 rounded-r shadow-sm flex items-start animate-fade-in">
-        <div class="text-pink-500 mr-3 mt-1">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div v-if="totalPrice > 0 && maxSafePoints > 0" class="mb-6 bg-[#fffbeb] border border-amber-200 p-5 rounded-xl shadow-sm flex items-center gap-4 animate-fade-in">
+        <div class="bg-amber-100 text-amber-600 rounded-full p-2 flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
         </div>
         <div>
-            <p class="text-slate-800 font-bold text-lg">
-                <span class="text-2xl text-pink-600">{{ maxSafePoints.toLocaleString() }}</span> ポイントまで使っても損しません
+            <p class="text-amber-900 font-bold text-lg leading-tight">
+                <span class="text-2xl">{{ maxSafePoints.toLocaleString() }}</span> ポイントまで使えます！
             </p>
-            <p class="text-slate-600 text-sm mt-1">
-                端数処理の仕様上、ここまでなら現金払いと同等の還元率({{ formatRate(maxRate) }})が維持されます。
+            <p class="text-amber-700 text-sm mt-1">
+                ここまでなら、現金払いと同等の還元率 <span class="font-bold bg-amber-100 px-1 rounded">{{ formatRate(maxRate) }}</span> をキープできます。
             </p>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-        <div class="p-4 bg-slate-800 text-white flex justify-between items-center">
-            <h2 class="font-bold flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-12">
+        <div class="p-5 bg-slate-800 text-white flex justify-between items-end">
+            <h2 class="font-bold text-lg flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                 計算結果
             </h2>
             <div class="text-right">
-                <div class="text-xs text-slate-300">お支払い合計</div>
-                <div class="text-xl font-bold leading-none">{{ totalPrice.toLocaleString() }} <span class="text-sm">円</span></div>
+                <div class="text-xs text-slate-400 font-medium mb-1">お支払い合計</div>
+                <div class="text-2xl font-bold leading-none tracking-tight">{{ totalPrice.toLocaleString() }} <span class="text-sm font-medium opacity-70">円</span></div>
             </div>
         </div>
         
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
-                        <th class="p-4 font-bold whitespace-nowrap">評価</th>
-                        <th class="p-4 font-bold text-right whitespace-nowrap">利用ポイント</th>
-                        <th class="p-4 font-bold text-right whitespace-nowrap">現金支払い</th>
-                        <th class="p-4 font-bold text-right whitespace-nowrap">獲得ポイント</th>
-                        <th class="p-4 font-bold text-right whitespace-nowrap">実質還元率</th>
+                    <tr class="bg-slate-50 text-slate-500 text-xs font-bold border-b border-slate-200">
+                        <th class="p-4 whitespace-nowrap w-32">判定</th>
+                        <th class="p-4 text-right whitespace-nowrap">利用ポイント</th>
+                        <th class="p-4 text-right whitespace-nowrap">現金支払い</th>
+                        <th class="p-4 text-right whitespace-nowrap">獲得ポイント</th>
+                        <th class="p-4 text-right whitespace-nowrap">実質還元率</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm">
-                    <tr class="bg-slate-50 border-b border-slate-200">
-                        <td class="p-4">
-                            <span class="inline-block px-2 py-1 rounded bg-slate-200 text-slate-600 text-xs font-bold">基準 (現金)</span>
-                        </td>
-                        <td class="p-4 text-right font-mono text-slate-400">0 P</td>
-                        <td class="p-4 text-right font-medium">{{ totalPrice.toLocaleString() }} 円</td>
-                        <td class="p-4 text-right font-medium">{{ maxGetP.toLocaleString() }} P</td>
-                        <td class="p-4 text-right font-medium">{{ formatRate(maxRate) }}</td>
-                    </tr>
-
+                <tbody class="text-sm divide-y divide-slate-100">
                     <tr v-for="(res, idx) in sortedResults" :key="idx" 
                         :class="getRowClass(res)" 
-                        class="border-b last:border-0 border-slate-200 transition duration-150">
+                        class="transition hover:opacity-90">
                         
-                        <td class="p-4">
-                            <span v-if="res.isMaxSafeUsage" class="inline-block px-2 py-1 rounded bg-white text-pink-600 border border-pink-200 text-xs font-bold shadow-sm">
-                                推奨
-                            </span>
-                            <span v-else-if="res.rate >= maxRate" class="inline-block px-2 py-1 rounded bg-white/80 text-yellow-800 border border-yellow-200 text-xs font-bold">
-                                損なし
-                            </span>
-                            <span v-else class="text-slate-400 text-xs">
-                                -
-                            </span>
+                        <td class="p-4 align-middle">
+                            <div class="flex flex-col items-start gap-1.5">
+                                <span v-if="res.isMaxSafeUsage" class="badge bg-amber-100 text-amber-800 border-amber-200 shadow-sm">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    損せず最大消費
+                                </span>
+
+                                <span v-if="res.isBestRate && !res.isMaxSafeUsage" class="badge bg-rose-100 text-rose-800 border-rose-200">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    最高還元率
+                                </span>
+
+                                <span v-if="res.payp === 0" class="badge bg-slate-100 text-slate-500 border-slate-200">
+                                    基準 (現金)
+                                </span>
+
+                                <span v-if="!res.isBestRate && !res.isMaxSafeUsage && res.rate >= maxRate && res.payp !== 0" class="badge bg-white text-slate-500 border-slate-200">
+                                    損なし
+                                </span>
+                            </div>
                         </td>
 
-                        <td class="p-4 text-right font-mono font-bold text-lg text-slate-800">
-                            {{ res.payp.toLocaleString() }} P
+                        <td class="p-4 text-right font-mono text-lg tracking-tight" :class="getPointColor(res)">
+                            {{ res.payp.toLocaleString() }} <span class="text-sm opacity-60">P</span>
                         </td>
-                        <td class="p-4 text-right text-slate-600">
-                            {{ (totalPrice - res.payp).toLocaleString() }} 円
+                        <td class="p-4 text-right text-slate-600 font-medium">
+                            {{ (totalPrice - res.payp).toLocaleString() }} <span class="text-xs">円</span>
                         </td>
-                        <td class="p-4 text-right font-medium text-slate-700">
-                            {{ res.getp.toLocaleString() }} P
+                        <td class="p-4 text-right text-slate-600 font-medium">
+                            {{ res.getp.toLocaleString() }} <span class="text-xs">P</span>
                         </td>
-                        <td class="p-4 text-right font-mono">
+                        <td class="p-4 text-right font-mono font-medium">
                             <span :class="getRateClass(res)">
                                 {{ formatRate(res.rate) }}
                             </span>
@@ -178,9 +179,12 @@
                     </tr>
                     
                     <tr v-if="sortedResults.length === 0 && totalPrice > 0" class="text-center text-slate-500">
-                        <td colspan="5" class="p-10">
-                            <p class="mb-2">💡 全額現金払いが最適です</p>
-                            <p class="text-xs">（ポイントを使うと確実に還元率が下がるパターンしか見つかりませんでした）</p>
+                        <td colspan="5" class="p-12">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-10 h-10 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="font-bold text-slate-600">全額現金払いが最適です</p>
+                                <p class="text-xs mt-1">（ポイントを使うと還元率が低下します）</p>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -189,38 +193,33 @@
     </div>
 </div>
 
-<footer class="bg-white border-t border-slate-200 py-8 mt-auto">
-    <div class="max-w-4xl mx-auto px-4">
+<footer class="bg-white border-t border-slate-200 py-10 mt-auto">
+    <div class="max-w-3xl mx-auto px-6">
         
-        <details class="mb-8 group">
-            <summary class="flex items-center justify-center text-sm font-bold text-slate-500 hover:text-slate-800 transition select-none">
-                <svg class="w-4 h-4 mr-2 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                計算ロジックについて（たけぼう様の解説より）
+        <details class="mb-10 group cursor-pointer">
+            <summary class="flex items-center justify-center text-sm font-bold text-slate-400 hover:text-slate-600 transition select-none list-none">
+                <span>計算ロジックについて（たけぼう様の解説より）</span>
+                <svg class="w-4 h-4 ml-2 transition-transform group-open:rotate-180 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </summary>
-            <div class="mt-4 p-6 bg-slate-50 rounded-xl text-sm leading-relaxed text-slate-700 max-w-2xl mx-auto border border-slate-100">
-                <h3 class="font-bold text-slate-900 mb-2">なぜポイントを使っても損しない場合があるのか</h3>
-                <p class="mb-3">
-                    ヨドバシカメラのシステムでは、支払いにポイントを使用した場合、まず「商品価格に応じて利用ポイントが按分」され、「各商品の残額（現金相当額）が四捨五入」で計算されます。
-                    <br>そして、その残額に還元率を掛けたあと、最終的な獲得ポイントは<b>「小数点以下切り上げ」</b>で処理されます。
+            <div class="mt-6 p-6 bg-slate-50 rounded-2xl text-sm leading-relaxed text-slate-600 border border-slate-100 shadow-inner">
+                <h3 class="font-bold text-slate-800 mb-3 text-base">なぜポイントを使っても損しない？</h3>
+                <p class="mb-4">
+                    ヨドバシカメラのシステムでは、ポイント利用時の計算において<b>「単価ごとの按分・四捨五入」</b>と<b>「最終的な小数点以下の切り上げ」</b>が行われます。
+                    この「切り上げ」が発生するギリギリのラインを狙うことで、ポイントを使っても獲得ポイントが減らない（＝実質還元率が維持される）現象が発生します。
                 </p>
-                <div class="bg-white p-4 rounded border border-slate-200 mb-3 font-mono text-xs shadow-sm">
-                    例: 1,980円 (10%) の商品を2つ買う場合<br>
-                    合計3,960円。通常 396ポイント獲得。<br>
-                    <br>
-                    ここで <b>1ポイントだけ</b> 使って3,959円支払うと…<br>
-                    按分: 1,980円 - 0.5P = 1,979.5円 (四捨五入して 1,980円扱い)<br>
-                    還元: 1,980円 × 10% = 198ポイント<br>
-                    合計: 198 × 2個 = <b>396ポイント (獲得数変わらず！)</b>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 font-mono text-xs text-slate-500 shadow-sm">
+                    例: 1,980円 (10%) × 2個 = 合計 3,960円 (通常 396P)<br>
+                    <span class="text-amber-600 font-bold">→ 1ポイント使用して 3,959円支払う</span><br>
+                    按分: 1,980 - 0.5 = 1,979.5 (四捨五入で 1,980円とみなされる)<br>
+                    還元: 1,980 × 10% = 198P<br>
+                    合計: 198 × 2個 = <span class="font-bold text-slate-800">396P (獲得数変わらず！)</span>
                 </div>
-                <p>
-                    このツールは、上記のような「端数処理の隙間」が発生する利用額を総当たりで計算し、還元率が低下しない（あるいは向上する）ポイント数を提示しています。
-                </p>
             </div>
         </details>
 
         <div class="text-center">
-            <p class="text-sm text-slate-600 leading-relaxed">
-                本ツールは、<a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-slate-800 font-bold hover:underline">たけぼう様</a> の素晴らしい研究によって判明した<br class="md:hidden">
+            <p class="text-sm text-slate-500 leading-7">
+                本ツールは、<a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-slate-800 font-bold hover:text-amber-500 hover:underline transition">たけぼう様</a> の素晴らしい研究によって判明した<br class="md:hidden">
                 ヨドバシゴールドポイントの計算ロジックをもとに、<br class="hidden md:inline">
                 個人的に使いやすいように作ったツールです。
             </p>
@@ -235,7 +234,6 @@ createApp({
     setup() {
         const items = ref([{ price: 0, rate: 10, qty: 1 }]);
         const heldPoints = ref(null);
-        // ソート機能は削除し、内部ロジックで昇順固定
         const showRawInput = ref(false);
         const rawInput = ref('');
 
@@ -275,27 +273,51 @@ createApp({
             const userLimit = heldPoints.value !== null ? heldPoints.value : total;
             
             let res = [];
+            // 0ポイント利用（現金）の場合も含めて計算
             let currentGetP = maxGetP.value;
+            
+            // 0ポイント利用を最初に追加
+            res.push({
+                payp: 0,
+                getp: maxGetP.value,
+                rate: maxRate.value,
+                isBestRate: false,
+                isMaxSafeUsage: false
+            });
+
             let payp = 0;
             let row = 0;
 
-            while (row < limit && currentGetP > 0 && payp < total) {
+            while (row < limit && payp < total) {
                 payp++;
                 if (payp > userLimit) break;
 
                 const newGetP = calcPoints(payp, currentItems, total);
                 
+                // 獲得ポイントが変わらない場合、スキップして次のPへ（効率化）
+                // ただし、還元率の計算のために「獲得ポイントが減る直前」だけでなく
+                // 「1ポイントずつ」のチェックが必要な場合もあるが、
+                // 今回のロジックでは「変化点」だけを捉えるのが主流。
+                // 修正: 昇順リストを作るため、有効なポイント数はすべて網羅すべきだが
+                // 数千行になると重いので、「還元率が維持・向上する点」のみ抽出するロジックにする
+                
                 if (newGetP === currentGetP) continue;
                 
+                // 変化点の一つ前が「局所最適解」
                 const optimalPayP = payp - 1;
-                const rate = (total - optimalPayP + (maxGetP.value - currentGetP)) ? currentGetP / (total - optimalPayP + (maxGetP.value - currentGetP)) : 0;
-                // ※元ロジックの簡易還元率計算を使用
-
+                
+                // 0は既に追加済みなのでスキップ
                 if (optimalPayP > 0) {
+                    const lostPoints = maxGetP.value - currentGetP;
+                    const cashPaid = total - optimalPayP;
+                    const denominator = cashPaid + lostPoints;
+                    const rate = denominator ? currentGetP / denominator : 0;
+
                     res.push({
                         payp: optimalPayP,
                         getp: currentGetP,
-                        rate: rate, // このrateはソート順には使わず、表示のみ
+                        rate: rate,
+                        isBestRate: false,
                         isMaxSafeUsage: false
                     });
                 }
@@ -304,27 +326,34 @@ createApp({
                 row++;
             }
             
+            // 全額支払い
             if (userLimit >= total && row < limit) {
-                 res.push({ payp: total, getp: 0, rate: 0, isMaxSafeUsage: false });
+                 res.push({ payp: total, getp: 0, rate: 0, isBestRate: false, isMaxSafeUsage: false });
             }
 
-            // フラグ判定: 損せず(還元率維持)最大消費できるものを探す
+            // フラグ判定
+            let globalBestRate = -1;
+            res.forEach(r => {
+                if (r.rate > globalBestRate) globalBestRate = r.rate;
+            });
+
             let maxSafePay = -1;
             res.forEach(r => {
-                // 還元率が基準以上 (誤差許容)
                 if (r.rate >= maxRate.value - 0.0000001) { 
                      if (r.payp > maxSafePay) maxSafePay = r.payp;
                 }
             });
 
             res.forEach(r => {
+                if (Math.abs(r.rate - globalBestRate) < 0.0000001) {
+                    r.isBestRate = true;
+                }
                 if (r.payp === maxSafePay && maxSafePay !== -1) {
                     r.isMaxSafeUsage = true;
                 }
             });
 
-            // 昇順ソート (1P -> Max P)
-            return res.sort((a, b) => a.payp - b.payp);
+            return res;
         });
 
         const maxSafePoints = computed(() => {
@@ -336,8 +365,10 @@ createApp({
             return 0;
         });
 
+        // 常に「利用ポイント昇順」でソート
         const sortedResults = computed(() => {
-            return results.value; // すでに昇順
+            const list = [...results.value];
+            return list.sort((a, b) => a.payp - b.payp);
         });
 
         // Helpers
@@ -348,13 +379,22 @@ createApp({
 
         // Styling helpers
         const getRowClass = (res) => {
-            if (res.isMaxSafeUsage) return 'row-best'; // ピンク (Best)
-            if (res.rate >= maxRate.value) return 'row-better'; // 黄色 (Better)
+            if (res.isMaxSafeUsage) return 'highlight-max'; // Gold
+            if (res.isBestRate) return 'highlight-best'; // Rose
+            if (res.rate >= maxRate.value) return 'bg-white hover:bg-slate-50';
             return 'bg-slate-50 text-slate-400';
         };
 
+        const getPointColor = (res) => {
+             if (res.isMaxSafeUsage) return 'text-amber-600 font-bold';
+             if (res.isBestRate) return 'text-rose-600 font-bold';
+             if (res.rate >= maxRate.value) return 'text-slate-800';
+             return 'text-slate-400';
+        };
+
         const getRateClass = (res) => {
-            if (res.rate >= maxRate.value) return 'font-bold text-slate-800';
+            if (res.isBestRate) return 'font-bold text-rose-600';
+            if (res.rate >= maxRate.value) return 'font-bold text-slate-700';
             return 'text-slate-400';
         };
 
@@ -375,7 +415,8 @@ createApp({
         return {
             items, heldPoints, showRawInput, rawInput,
             totalPrice, maxGetP, maxRate, sortedResults, maxSafePoints,
-            addItem, removeItem, clearList, parseRawInput, formatRate, getRowClass, getRateClass
+            addItem, removeItem, clearList, parseRawInput, formatRate, 
+            getRowClass, getRateClass, getPointColor
         };
     }
 }).mount('#app');
