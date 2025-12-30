@@ -12,17 +12,17 @@
         body { font-family: 'Inter', sans-serif; }
         [v-cloak] { display: none; }
         
-        /* カスタムハイライト色: 上品かつオトクな色合い */
-        /* 損せず最大消費 = ゴールド (金運・利益) */
+        /* カスタムハイライト色 */
+        /* 損せず最大消費 = ゴールド */
         .highlight-max { background-color: #fffbeb; border-left: 4px solid #f59e0b; } 
-        /* 最高還元率 = ローズ (特別感・理論値) */
+        /* 最高還元率 = ローズ */
         .highlight-best { background-color: #fff1f2; border-left: 4px solid #e11d48; }
         
         .badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; border-width: 1px; margin-right: 0.25rem; white-space: nowrap; }
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
         
-        /* 入力フォームのフォーカスリングを上品に */
+        /* 入力フォームのフォーカスリング */
         .input-focus:focus { outline: none; border-color: #f59e0b; ring: 2px; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
     </style>
 </head>
@@ -202,18 +202,27 @@
                 <svg class="w-4 h-4 ml-2 transition-transform group-open:rotate-180 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </summary>
             <div class="mt-6 p-6 bg-slate-50 rounded-2xl text-sm leading-relaxed text-slate-600 border border-slate-100 shadow-inner">
-                <h3 class="font-bold text-slate-800 mb-3 text-base">なぜポイントを使っても損しない？</h3>
+                <h3 class="font-bold text-slate-800 mb-3 text-base">ポイントを使っても損しないメカニズム</h3>
                 <p class="mb-4">
-                    ヨドバシカメラのシステムでは、ポイント利用時の計算において<b>「単価ごとの按分・四捨五入」</b>と<b>「最終的な小数点以下の切り上げ」</b>が行われます。
-                    この「切り上げ」が発生するギリギリのラインを狙うことで、ポイントを使っても獲得ポイントが減らない（＝実質還元率が維持される）現象が発生します。
+                    ヨドバシカメラのポイント計算システムには、以下の独特な仕様があります。
                 </p>
+                <ol class="list-decimal list-inside space-y-2 mb-4 pl-2 text-slate-500">
+                    <li>利用ポイントは商品価格に応じて<b>按分</b>される</li>
+                    <li>按分後の「現金支払額」は<b>四捨五入</b>される</li>
+                    <li>還元率を掛けた後の「獲得ポイント」は<b>切り上げ</b>される</li>
+                </ol>
                 <div class="bg-white p-4 rounded-xl border border-slate-200 font-mono text-xs text-slate-500 shadow-sm">
-                    例: 1,980円 (10%) × 2個 = 合計 3,960円 (通常 396P)<br>
+                    例: 1,980円 (10%) の商品を2つ購入 (合計3,960円)<br>
                     <span class="text-amber-600 font-bold">→ 1ポイント使用して 3,959円支払う</span><br>
-                    按分: 1,980 - 0.5 = 1,979.5 (四捨五入で 1,980円とみなされる)<br>
-                    還元: 1,980 × 10% = 198P<br>
-                    合計: 198 × 2個 = <span class="font-bold text-slate-800">396P (獲得数変わらず！)</span>
+                    <br>
+                    1. 按分: 1,980 - 0.5P = 1,979.5円<br>
+                    2. 丸め: 1,979.5 → <b>1,980円</b> (四捨五入で現金満額とみなされる)<br>
+                    3. 還元: 1,980 × 10% = 198P<br>
+                    4. 合計: 198 × 2個 = <span class="font-bold text-slate-800">396P (減っていない！)</span>
                 </div>
+                <p>
+                    このように「四捨五入」と「切り上げ」の隙間を突くことで、実質還元率を維持したままポイントを消費できるポイント数が存在します。
+                </p>
             </div>
         </details>
 
@@ -221,7 +230,7 @@
             <p class="text-sm text-slate-500 leading-7">
                 本ツールは、<a href="https://takebo.wpxblog.jp/yodobashi/" target="_blank" class="text-slate-800 font-bold hover:text-amber-500 hover:underline transition">たけぼう様</a> の素晴らしい研究によって判明した<br class="md:hidden">
                 ヨドバシゴールドポイントの計算ロジックをもとに、<br class="hidden md:inline">
-                個人的に使いやすいように作ったツールです。
+                個人的に使いやすいように作成したツールです。
             </p>
         </div>
     </div>
@@ -273,7 +282,6 @@ createApp({
             const userLimit = heldPoints.value !== null ? heldPoints.value : total;
             
             let res = [];
-            // 0ポイント利用（現金）の場合も含めて計算
             let currentGetP = maxGetP.value;
             
             // 0ポイント利用を最初に追加
@@ -294,19 +302,10 @@ createApp({
 
                 const newGetP = calcPoints(payp, currentItems, total);
                 
-                // 獲得ポイントが変わらない場合、スキップして次のPへ（効率化）
-                // ただし、還元率の計算のために「獲得ポイントが減る直前」だけでなく
-                // 「1ポイントずつ」のチェックが必要な場合もあるが、
-                // 今回のロジックでは「変化点」だけを捉えるのが主流。
-                // 修正: 昇順リストを作るため、有効なポイント数はすべて網羅すべきだが
-                // 数千行になると重いので、「還元率が維持・向上する点」のみ抽出するロジックにする
-                
                 if (newGetP === currentGetP) continue;
                 
-                // 変化点の一つ前が「局所最適解」
                 const optimalPayP = payp - 1;
                 
-                // 0は既に追加済みなのでスキップ
                 if (optimalPayP > 0) {
                     const lostPoints = maxGetP.value - currentGetP;
                     const cashPaid = total - optimalPayP;
@@ -326,7 +325,6 @@ createApp({
                 row++;
             }
             
-            // 全額支払い
             if (userLimit >= total && row < limit) {
                  res.push({ payp: total, getp: 0, rate: 0, isBestRate: false, isMaxSafeUsage: false });
             }
@@ -379,8 +377,8 @@ createApp({
 
         // Styling helpers
         const getRowClass = (res) => {
-            if (res.isMaxSafeUsage) return 'highlight-max'; // Gold
-            if (res.isBestRate) return 'highlight-best'; // Rose
+            if (res.isMaxSafeUsage) return 'highlight-max'; 
+            if (res.isBestRate) return 'highlight-best'; 
             if (res.rate >= maxRate.value) return 'bg-white hover:bg-slate-50';
             return 'bg-slate-50 text-slate-400';
         };
